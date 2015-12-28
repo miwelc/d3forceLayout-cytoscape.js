@@ -21,8 +21,10 @@
     stop: undefined // callback on layoutstop
   };
 
-  function D3ForceLayout( options ) {
-    this.options = $$.util.extend(true, {}, defaults, options);
+  function D3ForceLayout(options) {
+    var opts = this.options = {};
+    for(var i in defaults) { opts[i] = defaults[i]; }
+    for(var i in options) { opts[i] = options[i]; }
   }
 
   D3ForceLayout.prototype.stop = function() {
@@ -64,17 +66,17 @@
     layout.force = d3.layout.force()
       .nodes(nodes)
       .links(links)
-      .charge($$.is.fn(options.charge) ?
+      .charge((typeof options.charge === 'function') ?
         function(n, i) {
           return options.charge.apply(cyNodes[i], [cyNodes[i], i])
         }
         : options.charge)
-      .linkDistance($$.is.fn(options.linkDistance) ?
+      .linkDistance((typeof options.linkDistance === 'function') ?
         function(l, i) {
           return options.linkDistance.apply(l.cyEdge, [l.cyEdge, i])
         }
         : options.linkDistance)
-      .linkStrength($$.is.fn(options.linkStrength) ?
+      .linkStrength((typeof options.linkStrength === 'function') ?
         function(l, i) {
           return options.linkStrength.apply(l.cyEdge, [l.cyEdge, i])
         }
@@ -136,12 +138,12 @@
         layout.trigger({ type: 'layoutready', layout: layout });
       }
 
-      $$.util.requestAnimationFrame(ticksBatch);
+      window.requestAnimationFrame(ticksBatch);
     }
 
     layout.trigger({ type: 'layoutstart', layout: layout });
     layout.force.start();
-    $$.util.requestAnimationFrame(ticksBatch);
+    window.requestAnimationFrame(ticksBatch);
 
     return this; // chaining
   };
